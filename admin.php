@@ -564,8 +564,8 @@ select.fc{cursor:pointer;}
           <td><?= $ph['featured']?'⭐':'—' ?></td>
           <td style="display:flex;gap:4px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick='openPhotoMo(<?= htmlspecialchars(json_encode($ph),ENT_QUOTES) ?>)'>✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="delPhoto(<?= $ph['id'] ?>)">🗑</button>
-            <a href="index.php?photo=<?= e($ph['slug']) ?>" target="_blank" class="btn btn-ghost btn-sm">👁</a>
+            <button class="btn btn-danger btn-sm" onclick="delPhoto('<?= $ph['id'] ?>')">🗑</button>
+             <a href="index.php?photo=<?= e($ph['slug']) ?>" target="_blank" class="btn btn-ghost btn-sm">👁</a>
           </td>
         </tr>
         <?php endforeach; ?>
@@ -593,8 +593,8 @@ select.fc{cursor:pointer;}
           <td><span class="badge b-<?= e($sl['status']) ?>"><?= ucfirst(e($sl['status'])) ?></span></td>
           <td style="display:flex;gap:4px">
             <button class="btn btn-ghost btn-sm" onclick='openSlideMo(<?= htmlspecialchars(json_encode($sl),ENT_QUOTES) ?>)'>✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="delSlide(<?= $sl['id'] ?>)">🗑</button>
-          </td>
+            <button class="btn btn-danger btn-sm" onclick="delSlide('<?= $sl['id'] ?>')">🗑</button>
+         </td>
         </tr>
         <?php endforeach; ?>
         </tbody>
@@ -746,7 +746,7 @@ select.fc{cursor:pointer;}
         <td style="font-size:.68rem;color:rgba(128,128,128,0.38)"><?= date('d M Y',strtotime($rv['created_at'])) ?></td>
         <td style="display:flex;gap:4px">
           <button class="btn btn-ghost btn-sm" onclick='openReviewMo(<?= htmlspecialchars(json_encode($rv),ENT_QUOTES) ?>)'>✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="delReview(<?= $rv['id'] ?>)">🗑</button>
+          <button class="btn btn-danger btn-sm" onclick="delReview('<?= $rv['id'] ?>')">🗑</button>
         </td>
       </tr>
       <?php endforeach; ?>
@@ -767,8 +767,8 @@ select.fc{cursor:pointer;}
         <td><span class="badge b-info"><?= e($n['type']) ?></span></td>
         <td><?= $n['is_read']?'✅':'🔵 Unread' ?></td>
         <td style="font-size:.68rem;color:rgba(128,128,128,0.38)"><?= date('d M H:i',strtotime($n['created_at'])) ?></td>
-        <td><button class="btn btn-danger btn-sm" onclick="delNotif(<?= $n['id'] ?>)">🗑</button></td>
-      </tr>
+        <td><button class="btn btn-danger btn-sm" onclick="delNotif('<?= $n['id'] ?>')">🗑</button></td>
+    </tr>
       <?php endforeach; ?>
       </tbody>
     </table></div>
