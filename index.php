@@ -6,7 +6,7 @@ session_start();
 if (empty($_SESSION['visit_logged'])) {
     $_SESSION['visit_logged'] = true;
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    fbPush('visitor_logs', [
+    $_SESSION['visitor_key'] = fbPush('visitor_logs', [
         'session_id'   => session_id(),
         'ip_address'   => getClientIP(),
         'user_agent'   => $ua,
@@ -17,6 +17,17 @@ if (empty($_SESSION['visit_logged'])) {
         'visited_at'   => date('Y-m-d H:i:s'),
     ]);
 }
+    if ($_GET['ajax'] === 'log_screen') {
+        if (!empty($_SESSION['visitor_key'])) {
+            fbUpdate('visitor_logs/' . $_SESSION['visitor_key'], [
+                'screen_width'  => (int)($_GET['sw'] ?? 0),
+                'screen_height' => (int)($_GET['sh'] ?? 0)
+            ]);
+        }
+        echo json_encode(['ok'=>true]);
+        exit;
+    }
+
 
 // ── AJAX Handlers ─────────────────────────────────────────────────────────
 if (isset($_GET['ajax'])) {
