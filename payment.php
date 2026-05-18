@@ -1,6 +1,7 @@
 <?php
-session_start();
+
 require_once __DIR__ . '/helpers.php';
+session_start();
 
 $photoId  = $_GET['photo_id'] ?? '';   // firebase push key
 $fromCart = ($_GET['from'] ?? '') === 'cart';
