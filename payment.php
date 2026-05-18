@@ -44,9 +44,11 @@ if (!isset($_SESSION['payment_order_id']) || (time() - ($_SESSION['payment_time'
     $_SESSION['payment_order_id'] = generateOrderId();
     $_SESSION['payment_time']     = time();
     $ptitle = $fromCart ? implode(', ', array_column($cartPhotos, 'title')) : ($photo['title'] ?? '');
-    fbSet('payment_sessions/' . $_SESSION['payment_order_id'], [
+        fbSet('payment_sessions/' . $_SESSION['payment_order_id'], [
+        'order_id'     => $_SESSION['payment_order_id'], // <-- ADD THIS LINE
         'photo_id'     => $fromCart ? null : $photoId,
         'photo_title'  => $ptitle,
+
         'amount'       => $totalAmount,
         'customer_ip'  => getClientIP(),
         'browser_info' => getBrowserInfo(),
@@ -65,9 +67,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['utr'])) {
     if (strlen($utr) !== 12) { echo json_encode(['success'=>false,'msg'=>'UTR must be exactly 12 digits.']); exit; }
     $cntAt  = (int)($_POST['countdown_at_submit'] ?? 0);
     $ptitle = $fromCart ? implode(', ', array_column($cartPhotos,'title')) : ($photo['title']??'');
-    fbSet("purchases/$orderId", [
+        fbSet("purchases/$orderId", [
+        'order_id'            => $orderId, // <-- ADD THIS LINE
         'photo_id'            => $fromCart ? null : $photoId,
         'photo_title'         => $ptitle,
+
         'amount'              => $totalAmount,
         'utr_number'          => $utr,
         'payment_method'      => $_POST['method'] ?? 'UPI',
