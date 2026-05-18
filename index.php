@@ -3,9 +3,15 @@
 require_once __DIR__ . '/helpers.php';
 session_start();
 // ── Visitor logging (once per session) ────────────────────────────────────
+// ── Visitor logging (once per session) ────────────────────────────────────
 if (empty($_SESSION['visit_logged'])) {
     $_SESSION['visit_logged'] = true;
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    
+    // Safely check for HTTPS without relying on a custom function
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
+    
+    // Save the key to the session so we can attach the screen size to it later
     $_SESSION['visitor_key'] = fbPush('visitor_logs', [
         'session_id'   => session_id(),
         'ip_address'   => getClientIP(),
@@ -13,10 +19,18 @@ if (empty($_SESSION['visit_logged'])) {
         'browser_name' => parseBrowserName($ua),
         'os_name'      => parseOSName($ua),
         'referrer'     => $_SERVER['HTTP_REFERER'] ?? '',
-        'page_url'     => (isHttps()?'https':'http').'://'.($_SERVER['HTTP_HOST']??'').($_SERVER['REQUEST_URI']??''),
+        'page_url'     => $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? ''),
         'visited_at'   => date('Y-m-d H:i:s'),
     ]);
 }
+
+// ── AJAX Handlers ─────────────────────────────────────────────────────────
+if (isset($_GET['ajax'])) {
+    header('Content-Type: application/json');
+    $sid = session_id();
+    $ip  = getClientIP();
+
+    // Catch the screen size and update the visitor log!
     if ($_GET['ajax'] === 'log_screen') {
         if (!empty($_SESSION['visitor_key'])) {
             fbUpdate('visitor_logs/' . $_SESSION['visitor_key'], [
@@ -28,14 +42,8 @@ if (empty($_SESSION['visit_logged'])) {
         exit;
     }
 
-
-// ── AJAX Handlers ─────────────────────────────────────────────────────────
-if (isset($_GET['ajax'])) {
-    header('Content-Type: application/json');
-    $sid = session_id();
-    $ip  = getClientIP();
-
     if ($_GET['ajax'] === 'notifications') {
+
         $rows = fbGet('notifications') ?? [];
         $out  = [];
         foreach ($rows as $k => $n) {
