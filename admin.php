@@ -7,13 +7,15 @@ session_start();
 $loginError = '';
 if (isset($_POST['login'])) {
     $cfg = getAllSettings();
-    if (($_POST['username']??'') === ($cfg['admin_username']??'admin')
-     && ($_POST['password']??'') === ($cfg['admin_password']??'admin123')) {
+    // Added trim() below to strip accidental spaces from the username
+    if (trim($_POST['username'] ?? '') === ($cfg['admin_username'] ?? 'admin')
+     && ($_POST['password'] ?? '') === ($cfg['admin_password'] ?? 'admin123')) {
         $_SESSION['admin_logged_in'] = true;
         header('Location: admin.php'); exit;
     }
     $loginError = 'Invalid credentials.';
 }
+
 if (isset($_GET['logout'])) { session_destroy(); header('Location: admin.php'); exit; }
 
 // ── POST handlers (all Firebase, no DB) ──────────────────────────────────
@@ -703,14 +705,17 @@ select.fc{cursor:pointer;}
       <thead><tr><th>IP</th><th>Browser</th><th>OS</th><th>Screen</th><th>Referrer</th><th>Date</th></tr></thead>
       <tbody>
       <?php foreach ($visitors as $v): ?>
-      <tr>
-        <td class="mono" style="font-size:.76rem"><?= e($v['ip_address']) ?></td>
-        <td style="font-size:.76rem"><?= e($v['browser_name']) ?></td>
-        <td style="font-size:.76rem"><?= e($v['os_name']) ?></td>
-        <td style="font-size:.7rem;color:rgba(128,128,128,0.45)"><?= ($v['screen_width']&&$v['screen_height']) ? $v['screen_width'].'×'.$v['screen_height'] : '—' ?></td>
-        <td><span class="truncate" style="max-width:120px;font-size:.7rem;color:rgba(128,128,128,0.45)" title="<?= e($v['referrer']) ?>"><?= e($v['referrer']?:'Direct') ?></span></td>
-        <td style="font-size:.68rem;color:rgba(128,128,128,0.38)"><?= date('d M Y H:i',strtotime($v['visited_at'])) ?></td>
+     <tr>
+        <td class="mono" style="font-size:.76rem"><?= e($v['ip_address'] ?? 'Unknown') ?></td>
+        <td style="font-size:.76rem"><?= e($v['browser_name'] ?? 'Unknown') ?></td>
+        <td style="font-size:.76rem"><?= e($v['os_name'] ?? 'Unknown') ?></td>
+        <td style="font-size:.7rem;color:rgba(128,128,128,0.45)">
+          <?= (($v['screen_width'] ?? false) && ($v['screen_height'] ?? false)) ? ($v['screen_width'] ?? '').'×'.($v['screen_height'] ?? '') : '—' ?>
+        </td>
+        <td><span class="truncate" style="max-width:120px;font-size:.7rem;color:rgba(128,128,128,0.45)" title="<?= e($v['referrer'] ?? '') ?>"><?= e(($v['referrer'] ?? '') ? $v['referrer'] : 'Direct') ?></span></td>
+        <td style="font-size:.68rem;color:rgba(128,128,128,0.38)"><?= date('d M Y H:i', strtotime($v['visited_at'] ?? 'now')) ?></td>
       </tr>
+
       <?php endforeach; ?>
       </tbody>
     </table></div>
