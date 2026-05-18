@@ -155,10 +155,22 @@ if (isAdminLoggedIn()) {
     $totalPhotos = count(array_filter($photos, fn($p) => ($p['status']??'')==='active'));
 
     // Purchases
+        // Purchases
     foreach (fbGet('purchases') ?? [] as $k => $p) {
         if (!is_array($p)) continue;
         $p['id'] = $k;
+        $p['order_id'] = $p['order_id'] ?? $k; // <-- Fallback to Firebase key
         $purchases[] = $p;
+    }
+    // ... skipping some lines ...
+
+    // Payment sessions without UTR
+    foreach (fbGet('payment_sessions') ?? [] as $k => $ps) {
+        if (is_array($ps) && empty($ps['utr_submitted'])) { 
+            $ps['id']=$k; 
+            $ps['order_id'] = $ps['order_id'] ?? $k; // <-- Fallback to Firebase key
+            $sessionsNoUTR[]=$ps; 
+        }
     }
     usort($purchases, fn($a,$b) => strcmp($b['created_at']??'',$a['created_at']??''));
     $totalPurchases  = count($purchases);
